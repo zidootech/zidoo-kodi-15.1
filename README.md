@@ -9,6 +9,7 @@ which had deep modified to meet this new speicial version.
 Our modifies were commited to branch zidoo-15.1, so please checkout it after you clone repository.
 
 $git clone https://github.com/zidootech/zidoo-kodi-15.1.git
+
 $git checkout -b zidoo-15.1 origin/zidoo-15.1
 
 We modified ffmpeg too, so after checkout branch, apply the ffmpeg patch "kodi-ffmpeg-patch-20150910.patch" to your ffmpeg.
