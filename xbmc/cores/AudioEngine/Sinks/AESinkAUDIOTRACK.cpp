@@ -26,6 +26,8 @@
 #if defined(HAS_LIBAMCODEC)
 #include "utils/AMLUtils.h"
 #endif
+
+#include "cores/dvdplayer/DVDCodecs/Video/DVDVideoCodecRK.h"
 #include "utils/log.h"
 
 #include "android/jni/AudioFormat.h"
@@ -138,8 +140,8 @@ static CAEChannelInfo AUDIOTRACKChannelMaskToAEChannelMap(int atMask)
 
 static int AEChannelMapToAUDIOTRACKChannelMask(CAEChannelInfo info)
 {
-  if (info[0] == AE_CH_RAW)
-    return CJNIAudioFormat::CHANNEL_OUT_STEREO;
+  //if (info[0] == AE_CH_RAW)
+  //  return CJNIAudioFormat::CHANNEL_OUT_STEREO;
 #ifdef LIMIT_TO_STEREO_AND_5POINT1_AND_7POINT1
   if (info.Count() > 6 && Has71Support())
     return CJNIAudioFormat::CHANNEL_OUT_5POINT1
@@ -222,9 +224,11 @@ bool CAESinkAUDIOTRACK::Initialize(AEAudioFormat &format, std::string &device)
     aml_set_audio_passthrough(m_passthrough);
 #endif
 
+  rk_set_audio_passthrough(m_passthrough);
+
   int atChannelMask = AEChannelMapToAUDIOTRACKChannelMask(m_format.m_channelLayout);
 
-  m_format.m_sampleRate     = CJNIAudioTrack::getNativeOutputSampleRate(CJNIAudioManager::STREAM_MUSIC);
+  //m_format.m_sampleRate     = CJNIAudioTrack::getNativeOutputSampleRate(CJNIAudioManager::STREAM_MUSIC);
   m_format.m_dataFormat     = AE_FMT_S16LE;
 
   while (!m_at_jni)
@@ -412,6 +416,9 @@ void CAESinkAUDIOTRACK::EnumerateDevicesEx(AEDeviceInfoList &list, bool force)
   }
   m_info.m_dataFormats.push_back(AE_FMT_S16LE);
   m_info.m_dataFormats.push_back(AE_FMT_AC3);
+  m_info.m_dataFormats.push_back(AE_FMT_DTS);
+  m_info.m_dataFormats.push_back(AE_FMT_EAC3);
+  m_info.m_dataFormats.push_back(AE_FMT_TRUEHD);
   m_info.m_dataFormats.push_back(AE_FMT_DTS);
 #if 0 //defined(__ARM_NEON__)
   if (g_cpuInfo.GetCPUFeatures() & CPU_FEATURE_NEON)

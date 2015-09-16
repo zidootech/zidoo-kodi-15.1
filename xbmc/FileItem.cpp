@@ -1100,6 +1100,11 @@ bool CFileItem::IsReadOnly() const
   return !CUtil::SupportsWriteFileOperations(m_strPath);
 }
 
+bool CFileItem::IsSSIF() const
+{
+	return URIUtils::HasExtension(m_strPath, ".ssif");
+}
+
 void CFileItem::FillInDefaultIcon()
 {
   //CLog::Log(LOGINFO, "FillInDefaultIcon(%s)", pItem->GetLabel().c_str());

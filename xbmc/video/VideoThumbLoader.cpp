@@ -91,7 +91,13 @@ bool CThumbExtractor::DoWork()
   ||  m_item.IsDVDFile(false, true)
   ||  m_item.IsInternetStream()
   ||  m_item.IsDiscStub()
-  ||  m_item.IsPlayList())
+  ||  m_item.IsPlayList()
+  ||  m_item.IsSSIF())
+    return false;
+
+  /* by rk without these codes may cause huge memory leak in mvc 3d movie iso */
+  CURL url(m_item.GetPath());
+  if (url.IsProtocol("udf") && !url.GetFileName().empty())
     return false;
 
   // For HTTP/FTP we only allow extraction when on a LAN
