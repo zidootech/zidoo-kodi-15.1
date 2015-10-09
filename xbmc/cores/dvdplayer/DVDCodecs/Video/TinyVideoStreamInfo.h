@@ -3,16 +3,15 @@
 
 typedef struct _TinyVideoStreamInfo
 {
-	// Codec BaseData
-	enum AVCodecID codec_id;
+  // Codec BaseData
+  enum AVCodecID codec_id;
+  int height;
+  int width;
 
-	
-	int height;
-	int width;
-	// Codec ExtraData
-	void* extradata;
-	unsigned int extrasize;
-	
+  // Codec ExtraData
+  void* extradata;
+  unsigned int extrasize;
+  
 }TinyVideoStreamInfo;
 
 #endif

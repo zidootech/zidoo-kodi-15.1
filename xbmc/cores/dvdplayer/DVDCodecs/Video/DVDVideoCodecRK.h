@@ -25,52 +25,52 @@
 
 #define MEDIA_AUDIO_DEFAULT     0
 #define MEDIA_AUDIO_HDMI_BYPASS 6
-#define MEDIA_AUDIO_SPDIF	    8
+#define MEDIA_AUDIO_SPDIF      8
 
 class CDVDVideoCodecRK : public CDVDVideoCodec
 {
+
 public:
-	CDVDVideoCodecRK();
-	
-	virtual ~CDVDVideoCodecRK();
+  CDVDVideoCodecRK();
+  
+  virtual ~CDVDVideoCodecRK();
 
-	virtual bool Open(CDVDStreamInfo &hints, CDVDCodecOptions &options); // call from CDVDFactoryCodec :: CreateVideoCodec
+  virtual bool Open(CDVDStreamInfo &hints, CDVDCodecOptions &options); // call from CDVDFactoryCodec :: CreateVideoCodec
 
-	virtual void Dispose(void);
+  virtual void Dispose(void);
 
-	virtual int  Decode(uint8_t *pData, int iSize, double dts, double pts);
+  virtual int  Decode(uint8_t *pData, int iSize, double dts, double pts);
 
-	virtual void Reset(void);
+  virtual void Reset(void);
 
-	virtual void Flush(void);
+  virtual void Flush(void);
 
-	virtual bool GetPicture(DVDVideoPicture *pDvdVideoPicture);
+  virtual bool GetPicture(DVDVideoPicture *pDvdVideoPicture);
 
-	virtual void SetSpeed(int iSpeed);
+  virtual void SetSpeed(int iSpeed);
 
-	virtual void SetDropState(bool bDrop);
+  virtual void SetDropState(bool bDrop);
 
-	virtual int  GetDataSize(void);
+  virtual int  GetDataSize(void);
 
-	virtual double GetTimeSize(void);
+  virtual double GetTimeSize(void);
 
-	virtual const char* GetName(void) { return (const char*)m_pFormatName; }
+  virtual const char* GetName(void) { return (const char*)m_pFormatName; }
 
 protected:
 
-	bool 			isRkHwSupport(CDVDStreamInfo &hints);
+  bool       isRkHwSupport(CDVDStreamInfo &hints);
 
+  CRKCodec            *m_Codec;
+  const char          *m_pFormatName;
+  DVDVideoPicture      m_videobuffer;
+  CDVDStreamInfo       m_hints;
+  bool                 m_opened;
+  CBitstreamParser    *m_bitparser;
+  CBitstreamConverter *m_bitstream;
+  CRect                m_display_rect;
 
-	CRKCodec       		*m_Codec;
-	const char     		*m_pFormatName;
-  	DVDVideoPicture 	m_videobuffer;
-	CDVDStreamInfo  	m_hints;
-  	bool            	m_opened;
-	CBitstreamParser 	*m_bitparser;
-  	CBitstreamConverter *m_bitstream;
-	CRect				m_display_rect;
 };
-
 
 void rk_set_audio_passthrough(bool passthrough);
 int  rk_get_audio_setting();

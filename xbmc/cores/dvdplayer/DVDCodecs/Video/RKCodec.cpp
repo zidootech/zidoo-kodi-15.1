@@ -50,162 +50,151 @@
 class DllLibRKCodecInterface
 {
 public:
-	virtual ~DllLibRKCodecInterface(){}
+  virtual ~DllLibRKCodecInterface(){}
 
-	virtual int 			kodi_init(void *info) = 0;
+  virtual int       kodi_init(void *info) = 0;
 
-	virtual int				kodi_open() = 0;
+  virtual int       kodi_open() = 0;
 
-	virtual int 			kodi_write(void *data, unsigned int isize, double pts, double dts) = 0;
+  virtual int       kodi_write(void *data, unsigned int isize, double pts, double dts) = 0;
 
-	virtual bool			kodi_close() = 0;
+  virtual bool      kodi_close() = 0;
 
-	virtual int				kodi_flush() = 0;
+  virtual int       kodi_flush() = 0;
 
-	virtual int 			kodi_reset() = 0;
+  virtual int       kodi_reset() = 0;
 
-	virtual	int				kodi_pause() = 0;
+  virtual int       kodi_pause() = 0;
 
-	virtual int				kodi_resume() = 0;
+  virtual int       kodi_resume() = 0;
 
-	virtual int				kodi_set_rect(int x1, int y1, int width, int height) = 0;
-	
-	virtual int64_t		kodi_get_video_pts() = 0;
+  virtual int       kodi_set_rect(int x1, int y1, int width, int height) = 0;
+  
+  virtual int64_t   kodi_get_video_pts() = 0;
 
-	virtual int64_t		kodi_set_video_pts(int64_t pts) = 0;
+  virtual int64_t   kodi_set_video_pts(int64_t pts) = 0;
 
-	virtual int				kodi_set_drop_state(bool b) = 0;
+  virtual int       kodi_set_drop_state(bool b) = 0;
 
-	virtual int 			kodi_set_3d_mode(int mode, bool bMVC3d = false) = 0;
+  virtual int       kodi_set_3d_mode(int mode, bool bMVC3d = false) = 0;
 
-	virtual	int				kodi_get_vpu_level() = 0;
-
-
-	
+  virtual int       kodi_get_vpu_level() = 0;
+  
 };
 
 class DllLibRKCodec : public DllDynamic, DllLibRKCodecInterface
 {
-	// librkcodec is static linked into librkffplayer.so
-	DECLARE_DLL_WRAPPER(DllLibRKCodec, "librkffplayer.so");
+  // librkcodec is static linked into librkffplayer.so
+  DECLARE_DLL_WRAPPER(DllLibRKCodec, "librkffplayer.so");
 
-	DEFINE_METHOD1(int, 		kodi_init, (void* p1));
-	DEFINE_METHOD0(int, 		kodi_open);
-	DEFINE_METHOD4(int, 		kodi_write, (void *p1, unsigned int p2, double p3, double p4));
-	DEFINE_METHOD0(bool, 	kodi_close);
-	DEFINE_METHOD0(int, 		kodi_flush);
-	DEFINE_METHOD0(int, 		kodi_reset);
-	DEFINE_METHOD0(int, 		kodi_pause);
-	DEFINE_METHOD0(int, 		kodi_resume);
-	DEFINE_METHOD4(int,		kodi_set_rect, (int p1, int p2, int p3, int p4));
-	DEFINE_METHOD0(INT64, 	kodi_get_video_pts);
-	DEFINE_METHOD1(INT64, 	kodi_set_video_pts, (INT64 p1));
-	DEFINE_METHOD0(int, 		kodi_get_vpu_level);
-	DEFINE_METHOD1(int, 		kodi_set_drop_state, (bool p1));
-	DEFINE_METHOD2(int, 		kodi_set_3d_mode, (int p1, bool p2));
-	
-	
+  DEFINE_METHOD1(int,     kodi_init, (void* p1));
+  DEFINE_METHOD0(int,     kodi_open);
+  DEFINE_METHOD4(int,     kodi_write, (void *p1, unsigned int p2, double p3, double p4));
+  DEFINE_METHOD0(bool,    kodi_close);
+  DEFINE_METHOD0(int,     kodi_flush);
+  DEFINE_METHOD0(int,     kodi_reset);
+  DEFINE_METHOD0(int,     kodi_pause);
+  DEFINE_METHOD0(int,     kodi_resume);
+  DEFINE_METHOD4(int,     kodi_set_rect, (int p1, int p2, int p3, int p4));
+  DEFINE_METHOD0(INT64,   kodi_get_video_pts);
+  DEFINE_METHOD1(INT64,   kodi_set_video_pts, (INT64 p1));
+  DEFINE_METHOD0(int,     kodi_get_vpu_level);
+  DEFINE_METHOD1(int,     kodi_set_drop_state, (bool p1));
+  DEFINE_METHOD2(int,     kodi_set_3d_mode, (int p1, bool p2));
 
-
-	BEGIN_METHOD_RESOLVE()
-		RESOLVE_METHOD(kodi_init)
-		RESOLVE_METHOD(kodi_open)
-		RESOLVE_METHOD(kodi_write)
-		RESOLVE_METHOD(kodi_reset)
-		RESOLVE_METHOD(kodi_close)
-		RESOLVE_METHOD(kodi_flush)
-		RESOLVE_METHOD(kodi_pause)
-		RESOLVE_METHOD(kodi_resume)
-		RESOLVE_METHOD(kodi_set_rect)
-		RESOLVE_METHOD(kodi_get_video_pts)
-		RESOLVE_METHOD(kodi_set_video_pts)
-		RESOLVE_METHOD(kodi_get_vpu_level)
-		RESOLVE_METHOD(kodi_set_drop_state)
-		RESOLVE_METHOD(kodi_set_3d_mode)
-	END_METHOD_RESOLVE()
-	
+  BEGIN_METHOD_RESOLVE()
+    RESOLVE_METHOD(kodi_init)
+    RESOLVE_METHOD(kodi_open)
+    RESOLVE_METHOD(kodi_write)
+    RESOLVE_METHOD(kodi_reset)
+    RESOLVE_METHOD(kodi_close)
+    RESOLVE_METHOD(kodi_flush)
+    RESOLVE_METHOD(kodi_pause)
+    RESOLVE_METHOD(kodi_resume)
+    RESOLVE_METHOD(kodi_set_rect)
+    RESOLVE_METHOD(kodi_get_video_pts)
+    RESOLVE_METHOD(kodi_set_video_pts)
+    RESOLVE_METHOD(kodi_get_vpu_level)
+    RESOLVE_METHOD(kodi_set_drop_state)
+    RESOLVE_METHOD(kodi_set_3d_mode)
+  END_METHOD_RESOLVE()
+  
 };
 
 
 CRKCodec::CRKCodec() : CThread("CRKCodec")
 {
 
-	#ifdef RK_KODI_DEBUG
-	CLog::Log(LOGDEBUG, "CRKCodec::CRKCodec()!");
-	#endif
-
-	m_opened 			= false;
-	m_speed 			= DVD_PLAYSPEED_NORMAL;
-	m_1st_pts 		= 0;
-	m_old_pts 		= 0;
-	m_cur_pts 		= 0;
-	m_last_pts		= 0;
-	m_cur_num     = 0;
-	m_old_num			= 0;
-	m_bDrop				= false;
-	m_bMVC3D			= false;
-	m_i3DMode			= RK_3DMODE_NONE;
-	m_stereo_mode = RENDER_STEREO_MODE_OFF;
-	m_display_rect.x1 = m_display_rect.x2 = m_display_rect.y1 = m_display_rect.y2 = 0;
-	
-	m_dll 				= new DllLibRKCodec;
-	if (!m_dll->Load())
-	{
-		CLog::Log(LOGDEBUG, "CRKCodec::m_dll load fail!");
-	}
+  #ifdef RK_KODI_DEBUG
+  CLog::Log(LOGDEBUG, "CRKCodec::CRKCodec()!");
+  #endif
+  m_opened      = false;
+  m_speed       = DVD_PLAYSPEED_NORMAL;
+  m_1st_pts     = 0;
+  m_cur_pts     = 0;
+  m_last_pts    = 0;
+  m_bDrop       = false;
+  m_bMVC3D      = false;
+  m_i3DMode     = RK_3DMODE_NONE;
+  m_stereo_mode = RENDER_STEREO_MODE_OFF;
+  m_display_rect.x1 = m_display_rect.x2 = m_display_rect.y1 = m_display_rect.y2 = 0;
+  m_dll         = new DllLibRKCodec;
+    
+  if (!m_dll->Load())
+  {
+    CLog::Log(LOGDEBUG, "CRKCodec::m_dll load fail!");
+  }
 
 }
 
 CRKCodec::~CRKCodec()
 {
-	StopThread();
-	delete m_dll, m_dll = NULL;
+  StopThread();
+  delete m_dll, m_dll = NULL;
 }
-
-
 
 bool CRKCodec::OpenDecoder(CDVDStreamInfo &hints)
 {
-	CLog::Log(LOGDEBUG,"RKCodec Open filename:%s",hints.filename.c_str());
-	m_hints = hints;
-	m_info.codec_id = hints.codec;
-	m_info.height = hints.height;
-	m_info.width = hints.width;
-	m_info.extradata = hints.extradata;
-	m_info.extrasize = hints.extrasize;
-	int err = m_dll->kodi_init(&m_info);
-	if (hints.codec_tag == AV_CODEC_ID_H264MVC)
-	{
-		CLog::Log(LOGDEBUG,"CRKCodec::MVC Detected!");
-		m_bMVC3D = true;
-		m_stereo_mode = RENDER_STEREO_MODE_SPLIT_VERTICAL;
-		SetVideo3dMode(RK_3DMODE_SIDE_BY_SIDE);
-		g_graphicsContext.SetStereoMode(m_stereo_mode);
-	}
-	err = m_dll->kodi_open();
-	if (!err)
-	{
-		CheckVideoRate(hints);
-		Create();
-		m_opened = true;
-		m_display_rect = CRect(0, 0, CDisplaySettings::Get().GetCurrentResolutionInfo().iWidth, CDisplaySettings::Get().GetCurrentResolutionInfo().iHeight);
-		CLog::Log(LOGDEBUG,"CRKCodec::kodi_opencodec() width = %d , height = %d, sWidth = %d, sHeight = %d, bFullStreen = %d", 
-		CDisplaySettings::Get().GetCurrentResolutionInfo().iWidth,
-		CDisplaySettings::Get().GetCurrentResolutionInfo().iHeight,
-		CDisplaySettings::Get().GetCurrentResolutionInfo().iScreenWidth,
-		CDisplaySettings::Get().GetCurrentResolutionInfo().iScreenHeight,
-		CDisplaySettings::Get().GetCurrentResolutionInfo().bFullScreen);
-		CLog::Log(LOGDEBUG,"CRKCodec::kodi_opencodec() OpenDecoder Success!");
-		g_renderManager.RegisterRenderUpdateCallBack((const void*)this, RenderUpdateCallBack);
-		return true;
-	}
-	return false;
+  CLog::Log(LOGDEBUG,"RKCodec Open filename:%s",hints.filename.c_str());
+  m_hints          = hints;
+  m_info.codec_id  = hints.codec;
+  m_info.height    = hints.height;
+  m_info.width     = hints.width;
+  m_info.extradata = hints.extradata;
+  m_info.extrasize = hints.extrasize;
+  int err = m_dll->kodi_init(&m_info);
+  if (hints.codec_tag == AV_CODEC_ID_H264MVC)
+  {
+    CLog::Log(LOGDEBUG,"CRKCodec::MVC Detected!");
+    m_bMVC3D = true;
+    m_stereo_mode = RENDER_STEREO_MODE_SPLIT_VERTICAL;
+    SetVideo3dMode(RK_3DMODE_SIDE_BY_SIDE);
+    g_graphicsContext.SetStereoMode(m_stereo_mode);
+  }
+  err = m_dll->kodi_open();
+  if (!err)
+  {
+    CheckVideoRate(hints);
+    Create();
+    m_opened = true;
+    m_display_rect = CRect(0, 0, CDisplaySettings::Get().GetCurrentResolutionInfo().iWidth, CDisplaySettings::Get().GetCurrentResolutionInfo().iHeight);
+    CLog::Log(LOGDEBUG,"CRKCodec::kodi_opencodec() width = %d , height = %d, sWidth = %d, sHeight = %d, bFullStreen = %d", 
+    CDisplaySettings::Get().GetCurrentResolutionInfo().iWidth,
+    CDisplaySettings::Get().GetCurrentResolutionInfo().iHeight,
+    CDisplaySettings::Get().GetCurrentResolutionInfo().iScreenWidth,
+    CDisplaySettings::Get().GetCurrentResolutionInfo().iScreenHeight,
+    CDisplaySettings::Get().GetCurrentResolutionInfo().bFullScreen);
+    CLog::Log(LOGDEBUG,"CRKCodec::kodi_opencodec() OpenDecoder Success!");
+    g_renderManager.RegisterRenderUpdateCallBack((const void*)this, RenderUpdateCallBack);
+    return true;
+  }
+  return false;
 }
 
 
 void CRKCodec::CheckVideoRate(CDVDStreamInfo &hints)
 {
-	// handle video rate
+  // handle video rate
   if (hints.rfpsrate > 0 && hints.rfpsscale != 0)
   {
     // check ffmpeg r_frame_rate 1st
@@ -216,102 +205,108 @@ void CRKCodec::CheckVideoRate(CDVDStreamInfo &hints)
     // then ffmpeg avg_frame_rate next
     video_rate = 0.5 + (float)UNIT_FREQ * hints.fpsscale / hints.fpsrate;
   }
+  else
+  {
+    // default 24fps
+    video_rate = 0.5 + (float)UNIT_FREQ * 1001 / 25000;
+  }
 
-	CLog::Log(LOGDEBUG, " CRKCodec::video rate %d",video_rate);
+  CLog::Log(LOGDEBUG, " CRKCodec::video rate %f",video_rate);
 }
 
 void CRKCodec::CloseDecoder(void)
 {
-	CLog::Log(LOGDEBUG, "CRKCodec::CloseDecoder()!");
-	StopThread();
-	m_dll->kodi_close();
-	g_graphicsContext.SetStereoMode(RENDER_STEREO_MODE_OFF);
+  CLog::Log(LOGDEBUG, "CRKCodec::CloseDecoder()!");
+  StopThread();
+  m_dll->kodi_close();
+  g_graphicsContext.SetStereoMode(RENDER_STEREO_MODE_OFF);
 }
 
 void CRKCodec::Reset()
 {
-	
-	CLog::Log(LOGDEBUG, "CRKCodec::Reset()!");
-	if(!m_opened)
-		return;
-	m_dll->kodi_reset();
-	m_1st_pts = 0;
-	m_cur_pts = 0;
-	m_last_pts = 0;
+  CLog::Log(LOGDEBUG, "CRKCodec::Reset()!");
+  if(!m_opened)
+    return;
+  m_dll->kodi_reset();
+  m_1st_pts = 0;
+  m_cur_pts = 0;
+  m_last_pts = 0;
 }
 
 void CRKCodec::Flush()
 {
-	if(!m_opened)
-		return;
-	m_dll->kodi_flush();
-	m_1st_pts = 0;
-	m_cur_pts = 0;
-	m_last_pts = 0;
-
+  if(!m_opened)
+    return;
+  m_dll->kodi_flush();
+  m_1st_pts = 0;
+  m_cur_pts = 0;
+  m_last_pts = 0;
 }
 
 int CRKCodec::Decode(uint8_t *pData, size_t iSize, double dts, double pts)
 {
 
-	int rtn = VC_BUFFER;
-	if(!m_opened)
-		return VC_BUFFER;
-	
-	g_renderManager.RegisterRenderUpdateCallBack((const void*)this, RenderUpdateCallBack);
-	
-	if (m_1st_pts <= 100)
-	{
-		m_1st_pts = (int64_t)pts;
-	}
-	
-	int res = m_dll->kodi_write(pData, iSize, pts, dts);
-	switch(res)
-	{
-		case RK_DECODE_STATE_BUFFER:
-			rtn = VC_BUFFER;
-			break;
-		case RK_DECODE_STATE_PICTURE:
-			rtn |= VC_PICTURE;
-			break;
-		case RK_DECODE_STATE_ERROR:
-			rtn = VC_ERROR;
-			break;
-		default:
-			rtn = VC_ERROR;
-			break;
-	}
-	if (((int64_t)pts) >100)
-		m_last_pts = pts;
-	
-	return rtn;
+  int rtn = VC_BUFFER;
+  if(!m_opened)
+    return VC_BUFFER;
+  
+  g_renderManager.RegisterRenderUpdateCallBack((const void*)this, RenderUpdateCallBack);
+  
+  if (m_1st_pts <= 100)
+  {
+    m_1st_pts = (int64_t)pts;
+  }
+  int res = m_dll->kodi_write(pData, iSize, pts, dts);
+  switch(res)
+  {
+    case RK_DECODE_STATE_BUFFER:
+      rtn = VC_BUFFER;
+      break;
+    case RK_DECODE_STATE_PICTURE:
+      if (m_speed != DVD_PLAYSPEED_PAUSE)
+        rtn = VC_PICTURE;
+      else
+        rtn |= VC_PICTURE;
+      break;
+    case RK_DECODE_STATE_BUFFER_PICTURE:
+      rtn |= VC_PICTURE;
+      break;
+    case RK_DECODE_STATE_ERROR:
+      rtn = VC_ERROR;
+      break;
+    default:
+      rtn = VC_ERROR;
+      break;
+  }
+  if (((int64_t)pts) >100)
+    m_last_pts = pts;
+  return rtn;
 }
 
 
 bool CRKCodec::GetPicture(DVDVideoPicture *pDvdVideoPicture)
 {
-	if(!m_opened)
-		return false;
-	pDvdVideoPicture->iFlags = DVP_FLAG_ALLOCATED;
+  if(!m_opened)
+    return false;
+  pDvdVideoPicture->iFlags = DVP_FLAG_ALLOCATED;
   pDvdVideoPicture->format = RENDER_FMT_BYPASS;
   pDvdVideoPicture->iDuration = (double)(video_rate * DVD_TIME_BASE) / UNIT_FREQ;
   pDvdVideoPicture->dts = DVD_NOPTS_VALUE;
-	pDvdVideoPicture->pts = DVD_NOPTS_VALUE;
+  pDvdVideoPicture->pts = DVD_NOPTS_VALUE;
   if (m_speed == DVD_PLAYSPEED_NORMAL)
   {
-		pDvdVideoPicture->pts = GetPlayerPtsSeconds() * (double)DVD_TIME_BASE;
+    pDvdVideoPicture->pts = GetPlayerPtsSeconds() * (double)DVD_TIME_BASE;
     pDvdVideoPicture->pts += 1 * pDvdVideoPicture->iDuration;
   }
   else
   {
-    // We are FF/RW; Do not use the Player clock or it just doesn't work
     if (m_cur_pts <= 100)
       pDvdVideoPicture->pts = (double)m_1st_pts / PTS_FREQ * DVD_TIME_BASE;
     else
       pDvdVideoPicture->pts = (double)m_cur_pts / PTS_FREQ * DVD_TIME_BASE;
   }
-	
-	return true;
+  
+  return true;
 }
 
 
@@ -325,23 +320,24 @@ double CRKCodec::GetPlayerPtsSeconds()
   return clock_pts;
 }
 
-int64_t	CRKCodec::GetVideoPts()
+int64_t  CRKCodec::GetVideoPts()
 {
-	return m_dll->kodi_get_video_pts();
+  return m_dll->kodi_get_video_pts();
 }
 
-int64_t	CRKCodec::SetVideoPts(int64_t	pts)
+int64_t  CRKCodec::SetVideoPts(int64_t  pts)
 {
-	return m_dll->kodi_set_video_pts(pts);
+  return m_dll->kodi_set_video_pts(pts);
 }
 
 void CRKCodec::SetSpeed(int speed)
 {
+  CLog::Log(LOGDEBUG,"RKTEST RKCODEC SetSpeed %d",speed);
   m_speed = speed;
   if (!m_opened)
     return;
-	
-	switch(speed)
+  
+  switch(speed)
   {
     case DVD_PLAYSPEED_PAUSE:
       m_dll->kodi_pause();
@@ -353,36 +349,36 @@ void CRKCodec::SetSpeed(int speed)
       m_dll->kodi_resume();
       break;
   }
-	
-	return;
+  
+  return;
 }
 
 void CRKCodec::SetDropState(bool b)
 {
-	if (m_bDrop != b)
-	{
-		//int ret = m_dll->kodi_set_drop_state(b);
-		m_bDrop = b;
-	}
-	return;
+  if (m_bDrop != b)
+  {
+    //int ret = m_dll->kodi_set_drop_state(b);
+    m_bDrop = b;
+  }
+  return;
 }
 
 int CRKCodec::GetDataSize()
 {
-	if(!m_opened)
-		return 0;
-	return 0;
+  if(!m_opened)
+    return 0;
+  return 0;
 }
 
 double CRKCodec::GetTimeSize()
 {
-	if(!m_opened)
-		return 0;
-	
-	if (m_cur_pts <= 100)
-		m_timesize = (double)(m_last_pts - m_1st_pts)/PTS_FREQ;
-	else
-		m_timesize = (double)(m_last_pts - m_cur_pts)/PTS_FREQ;
+  if(!m_opened)
+    return 0;
+  
+  if (m_cur_pts <= 100)
+    m_timesize = (double)(m_last_pts - m_1st_pts) / DVD_TIME_BASE;
+  else
+    m_timesize = (double)(m_last_pts - m_cur_pts) / DVD_TIME_BASE;
 
   double timesize = m_timesize;
   if (timesize < 0.0)
@@ -395,26 +391,24 @@ double CRKCodec::GetTimeSize()
 
 void CRKCodec::Process()
 {
-
-	#ifdef RK_KODI_DEBUG
-	CLog::Log(LOGDEBUG, "CRKCodec::Process()!");
-	#endif
-	
-	SetPriority(THREAD_PRIORITY_ABOVE_NORMAL);
-	while(!m_bStop)
-	{
-		int64_t video_pts = 0;
-		if (m_1st_pts > 0 || m_1st_pts == DVD_NOPTS_VALUE)
-		{
-			video_pts = GetVideoPts();
-			if (m_cur_pts != video_pts)
-			{
-				m_cur_num++;
-				m_cur_pts = video_pts;
-				double app_pts = GetPlayerPtsSeconds();
-				double offset  = g_renderManager.GetDisplayLatency() - CMediaSettings::Get().GetCurrentVideoSettings().m_AudioDelay;
-				app_pts += offset;
-				double error = app_pts - (double)video_pts/PTS_FREQ;
+  #ifdef RK_KODI_DEBUG
+  CLog::Log(LOGDEBUG, "CRKCodec::Process()!");
+  #endif
+  
+  SetPriority(THREAD_PRIORITY_ABOVE_NORMAL);
+  while(!m_bStop)
+  {
+    int64_t video_pts = 0;
+    if (m_1st_pts > 0 || m_1st_pts == DVD_NOPTS_VALUE)
+    {
+      video_pts = GetVideoPts();
+      if (m_cur_pts != video_pts)
+      {
+        m_cur_pts = video_pts;
+        double app_pts = GetPlayerPtsSeconds();
+        double offset  = g_renderManager.GetDisplayLatency() - CMediaSettings::Get().GetCurrentVideoSettings().m_AudioDelay;
+        app_pts += offset;
+        double error = app_pts - (double)video_pts/DVD_TIME_BASE;
         double abs_error = fabs(error);
         if (abs_error > 0.125)
         {
@@ -427,72 +421,66 @@ void CRKCodec::Process()
             SetVideoPts((int64_t)((double)video_pts + error/4*DVD_TIME_BASE));
           }
         }
-			}
-
-			//Sleep(100);
-		}
-		
-		//else
+      }
+    }
 SLEEP:
-			Sleep(100);
-
-	}
-
-	SetPriority(THREAD_PRIORITY_NORMAL);
-	#ifdef RK_KODI_DEBUG
-	CLog::Log(LOGDEBUG, "CRKCodec::Process Stopped!");
-	#endif	
+    Sleep(100);
+  }
+  SetPriority(THREAD_PRIORITY_NORMAL);
+  #ifdef RK_KODI_DEBUG
+  CLog::Log(LOGDEBUG, "CRKCodec::Process Stopped!");
+  #endif  
 }
 
 void CRKCodec::SetVideo3dMode(const int mode)
 {
-	if (m_i3DMode != mode /*&& m_bMVC3D*/)
-	{
-		m_i3DMode = mode;
-		m_dll->kodi_set_3d_mode(m_i3DMode, m_bMVC3D);
-	}
+  if (m_i3DMode != mode /*&& m_bMVC3D*/)
+  {
+    m_i3DMode = mode;
+    m_dll->kodi_set_3d_mode(m_i3DMode, m_bMVC3D);
+  }
 }
 
 void CRKCodec::RenderUpdateCallBack(const void *ctx, const CRect &SrcRect, const CRect &DestRect)
 {
-	((CRKCodec*)ctx)->UpdateRenderRect(SrcRect,DestRect);
+  ((CRKCodec*)ctx)->UpdateRenderRect(SrcRect,DestRect);
 }
 
 
 void CRKCodec::UpdateRenderRect(const CRect &SrcRect, const CRect &DestRect)
 {
-	RENDER_STEREO_MODE stereo_mode = g_graphicsContext.GetStereoMode();
-	if (m_stereo_mode != stereo_mode)
-	{
-		m_stereo_mode = stereo_mode;
-		switch(m_stereo_mode)
-		{
-		case RENDER_STEREO_MODE_SPLIT_HORIZONTAL:
-			SetVideo3dMode(RK_3DMODE_TOP_BOTTOM);
-			break;
-		case RENDER_STEREO_MODE_SPLIT_VERTICAL:
-			SetVideo3dMode(RK_3DMODE_SIDE_BY_SIDE);
-			break;
-		default:
-			SetVideo3dMode(RK_3DMODE_NONE);
-		}
-	}
-	
-	if (m_display_rect != DestRect)
-	{	
-		CLog::Log(LOGDEBUG,"CRKCodec::RenderUpdateCallBack");
-		m_display_rect = DestRect;
-		if (m_stereo_mode == RENDER_STEREO_MODE_SPLIT_HORIZONTAL)
-		{
-			m_display_rect.y2 *= 2.0;
-		}
-		else if (m_stereo_mode == RENDER_STEREO_MODE_SPLIT_VERTICAL)
-		{
-			m_display_rect.x2 *= 2.0;
-		}
-		m_dll->kodi_set_rect(m_display_rect.x1, m_display_rect.y1, (int)m_display_rect.Width(), (int)m_display_rect.Height());
-		m_display_rect = DestRect;
-	}
+  RENDER_STEREO_MODE stereo_mode = g_graphicsContext.GetStereoMode();
+  if (m_stereo_mode != stereo_mode)
+  {
+    m_stereo_mode = stereo_mode;
+    switch(m_stereo_mode)
+    {
+    case RENDER_STEREO_MODE_SPLIT_HORIZONTAL:
+      SetVideo3dMode(RK_3DMODE_TOP_BOTTOM);
+      break;
+    case RENDER_STEREO_MODE_SPLIT_VERTICAL:
+      SetVideo3dMode(RK_3DMODE_SIDE_BY_SIDE);
+      break;
+    default:
+      SetVideo3dMode(RK_3DMODE_NONE);
+    }
+  }
+  
+  if (m_display_rect != DestRect)
+  {  
+    CLog::Log(LOGDEBUG,"CRKCodec::RenderUpdateCallBack");
+    m_display_rect = DestRect;
+    if (m_stereo_mode == RENDER_STEREO_MODE_SPLIT_HORIZONTAL)
+    {
+      m_display_rect.y2 *= 2.0;
+    }
+    else if (m_stereo_mode == RENDER_STEREO_MODE_SPLIT_VERTICAL)
+    {
+      m_display_rect.x2 *= 2.0;
+    }
+    m_dll->kodi_set_rect(m_display_rect.x1, m_display_rect.y1, (int)m_display_rect.Width(), (int)m_display_rect.Height());
+    m_display_rect = DestRect;
+  }
 }
 
 

@@ -35,8 +35,11 @@ bool CEGLNativeTypeRKAndroid::CheckCompatibility()
 {
   if (StringUtils::StartsWithNoCase(CJNIBuild::HARDWARE, "rk3"))  // Rockchip
   {
-    if (SysfsUtils::HasRW("/sys/class/display/display0.HDMI/mode"))
-      return true;
+    if (SysfsUtils::HasRW("/sys/class/display/display0.HDMI/mode") || SysfsUtils::HasRW("/sys/class/display/HDMI/mode"))
+    {
+      CLog::Log(LOGDEBUG, "RKEGL: Detected");
+       return true;
+    }
     else
       CLog::Log(LOGERROR, "RKEGL: no rw on /sys/class/display/display0.HDMI/mode");
   }
@@ -93,7 +96,8 @@ bool CEGLNativeTypeRKAndroid::GetNativeResolution(RESOLUTION_INFO *res) const
 
   std::string mode;
   RESOLUTION_INFO hdmi_res;
-  if (SysfsUtils::GetString("/sys/class/display/display0.HDMI/mode", mode) == 0 && SysModeToResolution(mode, &hdmi_res))
+  if ((SysfsUtils::GetString("/sys/class/display/display0.HDMI/mode", mode) == 0 
+    || SysfsUtils::GetString("/sys/class/display/HDMI/mode", mode) == 0) && SysModeToResolution(mode, &hdmi_res))
   {
     m_curHdmiResolution = mode;
     *res = hdmi_res;
@@ -115,7 +119,6 @@ bool CEGLNativeTypeRKAndroid::SetNativeResolution(const RESOLUTION_INFO &res)
     case 600:
       switch(res.iScreenWidth)
       {
-        default:
         case 1280:
           return SetDisplayResolution("1280x720p-60");
           break;
@@ -125,12 +128,17 @@ bool CEGLNativeTypeRKAndroid::SetNativeResolution(const RESOLUTION_INFO &res)
           else
             return SetDisplayResolution("1920x1080p-60");
           break;
+	case 3840:
+          return SetDisplayResolution("4k2k60hz");
+          break;
+        default:
+          return SetDisplayResolution("1920x1080p-60");
+          break;
       }
       break;
     case 500:
       switch(res.iScreenWidth)
       {
-        default:
         case 1280:
           return SetDisplayResolution("1280x720p-50");
           break;
@@ -139,6 +147,12 @@ bool CEGLNativeTypeRKAndroid::SetNativeResolution(const RESOLUTION_INFO &res)
             return SetDisplayResolution("1920x1080i-50");
           else
             return SetDisplayResolution("1920x1080p-50");
+          break;
+	case 3840:
+            return SetDisplayResolution("4k2k50hz");
+          break;
+        default:
+          return SetDisplayResolution("1920x1080p-60");
           break;
       }
       break;
@@ -188,7 +202,8 @@ bool CEGLNativeTypeRKAndroid::ProbeResolutions(std::vector<RESOLUTION_INFO> &res
   CEGLNativeTypeAndroid::GetNativeResolution(&m_fb_res);
 
   std::string valstr;
-  if (SysfsUtils::GetString("/sys/class/display/display0.HDMI/modes", valstr) < 0)
+  if (SysfsUtils::GetString("/sys/class/display/display0.HDMI/modes", valstr) < 0 
+    && SysfsUtils::GetString("/sys/class/display/HDMI/mode", valstr) < 0)
     return false;
   std::vector<std::string> probe_str = StringUtils::Split(valstr, "\n");
 
@@ -221,7 +236,8 @@ bool CEGLNativeTypeRKAndroid::SetDisplayResolution(const char *resolution)
   // switch display resolution
   std::string out = resolution;
   out += '\n';
-  if (SysfsUtils::SetString("/sys/class/display/display0.HDMI/mode", out.c_str()) < 0)
+  if (SysfsUtils::SetString("/sys/class/display/display0.HDMI/mode", out.c_str()) < 0 
+    && SysfsUtils::SetString("/sys/class/display/HDMI/mode", out.c_str()) < 0 )
     return false;
 
   m_curHdmiResolution = resolution;
