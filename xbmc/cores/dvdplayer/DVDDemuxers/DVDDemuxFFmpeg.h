@@ -155,6 +155,7 @@ protected:
   bool     m_bMatroska;
   bool     m_bAVI;
   bool     m_bSSIF;
+  bool     m_bBackMVC;
   std::queue<DemuxPacket*> m_SSIFqueue;
   int      m_speed;
   unsigned m_program;

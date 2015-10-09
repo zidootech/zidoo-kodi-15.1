@@ -77,7 +77,9 @@ static const AEChannel KnownChannels[] = { AE_CH_FL, AE_CH_FR, AE_CH_FC, AE_CH_L
 static bool Has71Support()
 {
   /* Android 5.0 introduced side channels */
-  return CJNIAudioManager::GetSDKVersion() >= 21;
+  /*teturn CJNIAudioManager::GetSDKVersion() >= 21;*/
+  /*all 7point1 in support in rockchip */
+  return true;
 }
 
 static AEChannel AUDIOTRACKChannelToAEChannel(int atChannel)
@@ -419,7 +421,7 @@ void CAESinkAUDIOTRACK::EnumerateDevicesEx(AEDeviceInfoList &list, bool force)
   m_info.m_dataFormats.push_back(AE_FMT_DTS);
   m_info.m_dataFormats.push_back(AE_FMT_EAC3);
   m_info.m_dataFormats.push_back(AE_FMT_TRUEHD);
-  m_info.m_dataFormats.push_back(AE_FMT_DTS);
+  m_info.m_dataFormats.push_back(AE_FMT_DTSHD);
 #if 0 //defined(__ARM_NEON__)
   if (g_cpuInfo.GetCPUFeatures() & CPU_FEATURE_NEON)
     m_info.m_dataFormats.push_back(AE_FMT_FLOAT);

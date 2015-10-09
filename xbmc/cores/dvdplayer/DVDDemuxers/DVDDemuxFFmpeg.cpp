@@ -47,6 +47,7 @@
 #include "utils/StringUtils.h"
 #include "URL.h"
 #include "cores/FFmpeg.h"
+#include "android/jni/AudioManager.h"
 
 extern "C" {
 #include "libavutil/opt.h"
@@ -169,6 +170,8 @@ CDVDDemuxFFmpeg::CDVDDemuxFFmpeg() : CDVDDemux()
   m_currentPts = DVD_NOPTS_VALUE;
   m_bMatroska = false;
   m_bAVI = false;
+  m_bSSIF = false;
+  m_bBackMVC = false;
   m_bSSIF = false;
   m_speed = DVD_PLAYSPEED_NORMAL;
   m_program = UINT_MAX;
@@ -530,6 +533,12 @@ void CDVDDemuxFFmpeg::Dispose()
     CDVDDemuxUtils::FreeDemuxPacket(m_SSIFqueue.front());
     m_SSIFqueue.pop();
   }
+  
+  while (!m_SSIFqueue.empty())
+  {
+    CDVDDemuxUtils::FreeDemuxPacket(m_SSIFqueue.front());
+    m_SSIFqueue.pop();
+  }
 
   m_ioContext = NULL;
   m_pFormatContext = NULL;
@@ -676,6 +685,19 @@ DemuxPacket* CDVDDemuxFFmpeg::Read()
   { CSingleLock lock(m_critSection); // open lock scope
   if (m_pFormatContext)
   {
+  
+  // back mvc packet support in rk3288 android 4.4 
+    if (m_bSSIF && m_bBackMVC)
+    {
+      m_bBackMVC = false;
+      if (!m_SSIFqueue.empty())
+      {
+          DemuxPacket* mvcpkt = m_SSIFqueue.front();
+          m_SSIFqueue.pop();
+          if (mvcpkt)
+            return mvcpkt;
+      }
+    }
     // assume we are not eof
     if(m_pFormatContext->pb)
       m_pFormatContext->pb->eof_reached = 0;
@@ -899,21 +921,28 @@ DemuxPacket* CDVDDemuxFFmpeg::Read()
           }
           if (tsA == tsB)
           {
-            m_SSIFqueue.pop();
-            DemuxPacket* newpkt = CDVDDemuxUtils::AllocateDemuxPacket(pPacket->iSize + mvcpkt->iSize);
-            newpkt->pts = pPacket->pts;
-            newpkt->dts = pPacket->dts;
-            newpkt->duration = pPacket->duration;
-            newpkt->iGroupId = pPacket->iGroupId;
-            newpkt->iStreamId = pPacket->iStreamId;
-            newpkt->iSize = pPacket->iSize + mvcpkt->iSize;
-            memcpy(newpkt->pData, pPacket->pData, pPacket->iSize);
-            memcpy(newpkt->pData + pPacket->iSize, mvcpkt->pData, mvcpkt->iSize);
-            //CLog::Log(LOGDEBUG, ">>> MVC merged packet: %d+%d, pts(%f/%f) dts (%f/%f)", pPacket->iSize, mvcpkt->iSize, pPacket->pts, mvcpkt->pts, pPacket->dts, mvcpkt->dts);
-
-            CDVDDemuxUtils::FreeDemuxPacket(pPacket);
-            CDVDDemuxUtils::FreeDemuxPacket(mvcpkt);
-            pPacket = newpkt;
+            if (CJNIAudioManager::GetSDKVersion() >= 21)
+            {
+              m_SSIFqueue.pop();
+              DemuxPacket* newpkt = CDVDDemuxUtils::AllocateDemuxPacket(pPacket->iSize + mvcpkt->iSize);
+              newpkt->pts = pPacket->pts;
+              newpkt->dts = pPacket->dts;
+              newpkt->duration = pPacket->duration;
+              newpkt->iGroupId = pPacket->iGroupId;
+              newpkt->iStreamId = pPacket->iStreamId;
+              newpkt->iSize = pPacket->iSize + mvcpkt->iSize;
+              memcpy(newpkt->pData, pPacket->pData, pPacket->iSize);
+              memcpy(newpkt->pData + pPacket->iSize, mvcpkt->pData, mvcpkt->iSize);
+              CDVDDemuxUtils::FreeDemuxPacket(pPacket);
+              CDVDDemuxUtils::FreeDemuxPacket(mvcpkt);
+              pPacket = newpkt;
+            }
+            else
+            {
+              mvcpkt->pts = pPacket->pts + 5;
+              mvcpkt->iStreamId = pPacket->iStreamId;
+              m_bBackMVC = true;                
+            }
           }
           else
           {

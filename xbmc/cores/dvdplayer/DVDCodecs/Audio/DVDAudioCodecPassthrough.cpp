@@ -25,6 +25,7 @@
 #include <algorithm>
 
 #include "cores/AudioEngine/AEFactory.h"
+#include "../Video/DVDVideoCodecRK.h"
 
 CDVDAudioCodecPassthrough::CDVDAudioCodecPassthrough(void) :
   m_buffer    (NULL),
@@ -44,6 +45,15 @@ bool CDVDAudioCodecPassthrough::Open(CDVDStreamInfo &hints, CDVDCodecOptions &op
   bool bSupportsDTSOut    = CAEFactory::SupportsRaw(AE_FMT_DTS, hints.samplerate);
   bool bSupportsTrueHDOut = CAEFactory::SupportsRaw(AE_FMT_TRUEHD, 192000);
   bool bSupportsDTSHDOut  = CAEFactory::SupportsRaw(AE_FMT_DTSHD, 192000);
+  
+  /* only get the dts core from the parser if we don't support dtsHD,*/
+  /* add by rockchip if is spdif dts-hd get core to dts*/
+  if (rk_get_audio_setting() == MEDIA_AUDIO_SPDIF)
+  {
+    bSupportsDTSHDOut = false;
+    bSupportsTrueHDOut = false;
+    bSupportsEAC3Out = false;
+  }
 
   /* only get the dts core from the parser if we don't support dtsHD */
   m_info.SetCoreOnly(!bSupportsDTSHDOut);

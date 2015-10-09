@@ -22,6 +22,7 @@
 
  #include "DVDVideoCodecRK.h"
  #include "utils/SysfsUtils.h"
+ #include <sys/system_properties.h>
 
 
 
@@ -256,5 +257,13 @@ void rk_set_audio_passthrough(bool passthrough)
 		SysfsUtils::SetInt("/sdcard/passthrough", passthrough ? 1:0);
 	}
 }
+
+int rk_get_audio_setting()
+{
+    char buf[PROP_VALUE_MAX]; 
+    __system_property_get("persist.audio.currentplayback", buf);
+    return atoi(buf);
+}
+
 
 

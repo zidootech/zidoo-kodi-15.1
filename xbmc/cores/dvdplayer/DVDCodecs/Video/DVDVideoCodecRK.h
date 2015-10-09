@@ -23,6 +23,9 @@
 #include "RKCodec.h"
 #include "utils/BitstreamConverter.h"
 
+#define MEDIA_AUDIO_DEFAULT     0
+#define MEDIA_AUDIO_HDMI_BYPASS 6
+#define MEDIA_AUDIO_SPDIF	    8
 
 class CDVDVideoCodecRK : public CDVDVideoCodec
 {
@@ -70,4 +73,5 @@ protected:
 
 
 void rk_set_audio_passthrough(bool passthrough);
+int  rk_get_audio_setting();
 
