@@ -37,6 +37,7 @@ SRCS += Engines/ActiveAE/ActiveAEBuffer.cpp
 
 ifeq (@USE_ANDROID@,1)
 SRCS += Sinks/AESinkAUDIOTRACK.cpp
+SRCS += Sinks/RKAESinkAUDIOTRACK.cpp
 else ifeq ($(findstring ios,@ARCH@),ios)
 SRCS += Sinks/AESinkDARWINIOS.cpp
 else ifeq ($(findstring osx,@ARCH@),osx)
