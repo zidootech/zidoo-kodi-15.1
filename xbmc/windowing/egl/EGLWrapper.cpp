@@ -94,9 +94,9 @@ bool CEGLWrapper::Initialize(const std::string &implementation)
 #if defined(HAVE_WAYLAND)
       (nativeGuess = CreateEGLNativeType<CEGLNativeTypeWayland>(implementation)) ||
 #endif
-#if defined(TARGET_ANDROID)
-      (nativeGuess = CreateEGLNativeType<CEGLNativeTypeAmlAndroid>(implementation)) ||
+#if defined(TARGET_ANDROID)      
       (nativeGuess = CreateEGLNativeType<CEGLNativeTypeRKAndroid>(implementation)) ||
+      (nativeGuess = CreateEGLNativeType<CEGLNativeTypeAmlAndroid>(implementation)) ||
       (nativeGuess = CreateEGLNativeType<CEGLNativeTypeAndroid>(implementation)) ||
 #endif
 #if defined(TARGET_RASPBERRY_PI)

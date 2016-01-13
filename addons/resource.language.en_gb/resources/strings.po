@@ -18106,3 +18106,9 @@ msgstr ""
 msgctxt "#38023"
 msgid "Set my rating"
 msgstr ""
+
+
+#: system/settings/settings.xml
+msgctxt "#38030"
+msgid "Allow hardware acceleration - RockchipCodec"
+msgstr ""

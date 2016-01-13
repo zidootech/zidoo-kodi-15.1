@@ -30,6 +30,7 @@
 #include "cores/AudioEngine/AEFactory.h"
 #include "cores/AudioEngine/Utils/AEUtil.h"
 #include "cores/DataCacheCore.h"
+#include "cores/dvdplayer/DVDCodecs/Video/DVDVideoCodecRK.h"
 
 #include <sstream>
 #include <iomanip>
@@ -119,6 +120,7 @@ CDVDPlayerAudio::CDVDPlayerAudio(CDVDClock* pClock, CDVDMessageQueue& parent)
   m_prevskipped = false;
   m_maxspeedadjust = 0.0;
 
+  m_rkadjust = false;
   m_messageQueue.SetMaxDataSize(6 * 1024 * 1024);
   m_messageQueue.SetMaxTimeSize(8.0);
 }
@@ -183,6 +185,11 @@ void CDVDPlayerAudio::OpenStream( CDVDStreamInfo &hints, CDVDAudioCodec* codec )
   m_setsynctype = SYNC_DISCON;
   if (CSettings::GetInstance().GetBool(CSettings::SETTING_VIDEOPLAYER_USEDISPLAYASCLOCK))
     m_setsynctype = SYNC_RESAMPLE;
+  if (CSettings::GetInstance().GetBool(CSettings::SETTING_VIDEOPLAYER_USERKFPSMATCH))
+  {
+    m_setsynctype = SYNC_RESAMPLE;
+    m_rkadjust = true;
+  }
   m_prevsynctype = -1;
 
   m_error = 0;
@@ -570,7 +577,7 @@ void CDVDPlayerAudio::Process()
     }
 
     // Zero out the frame data if we are supposed to silence the audio
-    if (m_silence || m_syncclock)
+    if ((m_silence || m_syncclock) && (!IsPassthrough()))
     {
       int size = audioframe.nb_frames * audioframe.framesize / audioframe.planes;
       for (unsigned int i=0; i<audioframe.planes; i++)
@@ -624,12 +631,12 @@ void CDVDPlayerAudio::SetSyncType(bool passthrough)
 
   //if SetMaxSpeedAdjust returns false, it means no video is played and we need to use clock feedback
   double maxspeedadjust = 0.0;
-  if (m_synctype == SYNC_RESAMPLE)
+  if (m_synctype == SYNC_RESAMPLE && !m_rkadjust)
     maxspeedadjust = m_maxspeedadjust;
 
   m_pClock->SetMaxSpeedAdjust(maxspeedadjust);
 
-  if (m_pClock->GetMaster() == MASTER_CLOCK_AUDIO)
+  if (m_pClock->GetMaster() == MASTER_CLOCK_AUDIO && !m_rkadjust)
     m_synctype = SYNC_DISCON;
 
   if(m_synctype == SYNC_DISCON && m_pClock->GetMaster() != MASTER_CLOCK_AUDIO)
@@ -724,7 +731,10 @@ void CDVDPlayerAudio::HandleSyncError(double duration)
       error = m_error;
     }
 
-    m_pClock->Update(clock+error, absolute, limit - 0.001, "CDVDPlayerAudio::HandleSyncError2");
+    /* rk adjust the speed should not sync master clock */
+    double adjust_delay = (double)rk_get_adjust_latency();
+    if (adjust_delay == 0)
+      m_pClock->Update(clock+error, absolute, limit - 0.001, "CDVDPlayerAudio::HandleSyncError2");
   }
   else if (m_synctype == SYNC_RESAMPLE)
   {
@@ -764,8 +774,16 @@ bool CDVDPlayerAudio::OutputPacket(DVDAudioFrame &audioframe)
     // below a given threshold. the constants are aligned with known
     // durations: DTS = 11ms, AC3 = 32ms
     // during this stage audio is muted
-    if (error > DVD_MSEC_TO_TIME(10))
+    // here in passthrough  mode, skip & duplicate sync may cause power amplifier confuse; by rk :)
+    if ((error > DVD_MSEC_TO_TIME(10) && !IsPassthrough()) || (error > DVD_MSEC_TO_TIME(200)))
     {
+      if (IsPassthrough())
+      {
+        int size = audioframe.nb_frames * audioframe.framesize / audioframe.planes;
+        for (unsigned int i=0; i<audioframe.planes; i++)
+          memset(audioframe.data[i], 0, size);
+      }
+
       unsigned int nb_frames = audioframe.nb_frames;
       double duration = audioframe.duration;
 
@@ -791,7 +809,7 @@ bool CDVDPlayerAudio::OutputPacket(DVDAudioFrame &audioframe)
 
       m_dvdAudio.AddPackets(audioframe);
     }
-    else if (error < -DVD_MSEC_TO_TIME(32))
+    else if ((error < -DVD_MSEC_TO_TIME(32) && !IsPassthrough()) || (error < -DVD_MSEC_TO_TIME(200)))
     {
       m_dvdAudio.SetPlayingPts(audioframe.pts);
       CLog::Log(LOGNOTICE,"CDVDPlayerAudio::OutputPacket skipping a packets of duration %d",

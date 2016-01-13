@@ -39,4 +39,5 @@ protected:
 
   bool SetDisplayResolution(const char *resolution);
   bool SysModeToResolution(std::string mode, RESOLUTION_INFO *res) const;
+  int Get3DMode();
 };

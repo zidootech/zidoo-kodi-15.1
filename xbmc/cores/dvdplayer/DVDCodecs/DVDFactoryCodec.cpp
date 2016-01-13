@@ -64,6 +64,11 @@
 #include "settings/VideoSettings.h"
 #include "utils/StringUtils.h"
 
+#define HAS_LIBRKCODEC
+#if defined(HAS_LIBRKCODEC)
+#include "Video/DVDVideoCodecRK.h"
+#endif
+
 CDVDVideoCodec* CDVDFactoryCodec::OpenCodec(CDVDVideoCodec* pCodec, CDVDStreamInfo &hints, CDVDCodecOptions &options )
 {
   try
@@ -154,6 +159,11 @@ CDVDVideoCodec* CDVDFactoryCodec::CreateVideoCodec(CDVDStreamInfo &hint, const C
 #elif defined(TARGET_DARWIN)
   hwSupport += "VideoToolBoxDecoder:no ";
 #endif
+#if defined(HAS_LIBRKCODEC)
+  hwSupport += "RKCodec:yes ";
+#else
+  hwSupport += "RKCodec:no ";
+#endif
 #if defined(HAS_LIBAMCODEC)
   hwSupport += "AMCodec:yes ";
 #else
@@ -200,6 +210,14 @@ CDVDVideoCodec* CDVDFactoryCodec::CreateVideoCodec(CDVDStreamInfo &hint, const C
   hwSupport += "MMAL:no ";
 #endif
   CLog::Log(LOGDEBUG, "CDVDFactoryCodec: compiled in hardware support: %s", hwSupport.c_str());
+
+#if defined(HAS_LIBRKCODEC)
+  if (!hint.software && CSettings::GetInstance().GetBool(CSettings::SETTING_VIDEOPLAYER_USERKCODEC))
+  {
+    CLog::Log(LOGDEBUG, "DVDFactoryCodec: Open RKCodec ");
+    if((pCodec = OpenCodec(new CDVDVideoCodecRK(), hint, options))) return pCodec;
+  }
+#endif
 
   if (hint.stills && (hint.codec == AV_CODEC_ID_MPEG2VIDEO || hint.codec == AV_CODEC_ID_MPEG1VIDEO))
   {

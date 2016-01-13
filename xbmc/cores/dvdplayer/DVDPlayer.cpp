@@ -635,6 +635,8 @@ CDVDPlayer::~CDVDPlayer()
   DestroyPlayers();
 }
 
+extern void rk_set_codec_enable(int enable);
+
 bool CDVDPlayer::OpenFile(const CFileItem& file, const CPlayerOptions &options)
 {
     CLog::Log(LOGNOTICE, "DVDPlayer: Opening: %s", CURL::GetRedacted(file.GetPath()).c_str());
@@ -664,6 +666,12 @@ bool CDVDPlayer::OpenFile(const CFileItem& file, const CPlayerOptions &options)
 #if defined(HAS_VIDEO_PLAYBACK)
     g_renderManager.PreInit();
 #endif
+    if (m_filename.compare(0, 4, "http", 4) && m_filename.compare(0, 4, "rtmp", 4) &&
+         m_filename.compare(0, 4, "rtsp", 4) && m_filename.compare(0, 3, "pvr", 3) && 
+         m_filename.compare(0, 3, "mms", 3))
+	rk_set_codec_enable(1);
+    else
+	rk_set_codec_enable(0);
 
     Create();
 
@@ -1330,8 +1338,9 @@ void CDVDPlayer::Process()
       continue;
 
     // if the queues are full, no need to read more
-    if ((!m_dvdPlayerAudio->AcceptsData() && m_CurrentAudio.id >= 0) ||
-        (!m_dvdPlayerVideo->AcceptsData() && m_CurrentVideo.id >= 0))
+    if (m_caching != CACHESTATE_INIT && 
+        ((!m_dvdPlayerAudio->AcceptsData() && m_CurrentAudio.id >= 0 && m_dvdPlayerVideo->GetLevel() > 50) ||
+        (!m_dvdPlayerVideo->AcceptsData() && m_CurrentVideo.id >= 0 &&  m_dvdPlayerAudio->GetLevel() > 50)))
     {
       if(m_pDemuxer && m_DemuxerPausePending)
       {
@@ -1414,10 +1423,10 @@ void CDVDPlayer::Process()
         m_OmxPlayerState.bOmxSentEOFs = true;
       }
 
-      if(m_CurrentAudio.inited)
-        m_dvdPlayerAudio->SendMessage(new CDVDMsg(CDVDMsg::GENERAL_EOF));
       if(m_CurrentVideo.inited)
         m_dvdPlayerVideo->SendMessage(new CDVDMsg(CDVDMsg::GENERAL_EOF));
+      if(m_CurrentAudio.inited)
+        m_dvdPlayerAudio->SendMessage(new CDVDMsg(CDVDMsg::GENERAL_EOF));      
       if(m_CurrentSubtitle.inited)
         m_dvdPlayerSubtitle->SendMessage(new CDVDMsg(CDVDMsg::GENERAL_EOF));
       if(m_CurrentTeletext.inited)
@@ -2318,9 +2327,10 @@ void CDVDPlayer::OnExit()
 
     // close each stream
     if (!m_bAbortRequest) CLog::Log(LOGNOTICE, "DVDPlayer: eof, waiting for queues to empty");
-    CloseStream(m_CurrentAudio,    !m_bAbortRequest);
+  
     CloseStream(m_CurrentVideo,    !m_bAbortRequest);
-
+    CloseStream(m_CurrentAudio,    !m_bAbortRequest);
+      
     // the generalization principle was abused for subtitle player. actually it is not a stream player like
     // video and audio. subtitle player does not run on its own thread, hence waitForBuffers makes
     // no sense here. waitForBuffers is abused to clear overlay container (false clears container)

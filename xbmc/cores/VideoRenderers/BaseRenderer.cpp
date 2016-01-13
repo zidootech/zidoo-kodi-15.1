@@ -220,6 +220,12 @@ void CBaseRenderer::FindResolutionFromFpsMatch(float fps, float& weight)
   }
 }
 
+void CBaseRenderer::setBestResolution(int width,int height)
+{
+	m_width = width;
+	m_height = height;
+}
+
 RESOLUTION CBaseRenderer::FindClosestResolution(float fps, float multiplier, RESOLUTION current, float& weight)
 {
   RESOLUTION_INFO curr = g_graphicsContext.GetResInfo(current);
@@ -242,10 +248,14 @@ RESOLUTION CBaseRenderer::FindClosestResolution(float fps, float multiplier, RES
   {
     const RESOLUTION_INFO info = g_graphicsContext.GetResInfo((RESOLUTION)i);
 
+ CLog::Log(LOGNOTICE, "FindClosestResolution : %d (%d) ,%d (%d) ,%d (%d) ,%f (%f) ,%d(%d)",
+        info.iScreenWidth,m_width,info.iScreenHeight,m_height,info.iScreen,curr.iScreen,
+        info.fRefreshRate,((fRefreshRate * multiplier / 1.001) - 0.001),(info.dwFlags & D3DPRESENTFLAG_MODEMASK),
+        (curr.dwFlags & D3DPRESENTFLAG_MODEMASK));
     //discard resolutions that are not the same width and height (and interlaced/3D flags)
     //or have a too low refreshrate
-    if (info.iScreenWidth  != curr.iScreenWidth
-    ||  info.iScreenHeight != curr.iScreenHeight
+    if (info.iScreenWidth  != m_width /*curr.iScreenWidth*/
+    ||  info.iScreenHeight !=  m_height /*curr.iScreenHeight*/
     ||  info.iScreen       != curr.iScreen
     ||  (info.dwFlags & D3DPRESENTFLAG_MODEMASK) != (curr.dwFlags & D3DPRESENTFLAG_MODEMASK)
     ||  info.fRefreshRate < (fRefreshRate * multiplier / 1.001) - 0.001)
@@ -290,10 +300,10 @@ RESOLUTION CBaseRenderer::FindClosestResolution(float fps, float multiplier, RES
 
       RESOLUTION current_bak = current;
       RESOLUTION_INFO curr_bak = curr;
-
+      CLog::Log(LOGNOTICE, "i_weight=%d, c_weigth = %d",i_weight,c_weight);
       // Closer the better, prefer higher refresh rate if the same
       if ((i_weight <  c_weight)
-      ||  (i_weight == c_weight && info.fRefreshRate > curr.fRefreshRate))
+      ||  (i_weight == c_weight && info.fRefreshRate >= fps /*curr.fRefreshRate*/))
       {
         current = (RESOLUTION)i;
         curr    = info;

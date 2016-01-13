@@ -34,6 +34,11 @@ CDVDOverlayContainer::~CDVDOverlayContainer()
 
 void CDVDOverlayContainer::Add(CDVDOverlay* pOverlay)
 {
+  extern int64_t rk_get_adjust_latency();
+  double rkoffset = (double)rk_get_adjust_latency();
+  pOverlay->iPTSStartTime -= rkoffset;
+  pOverlay->iPTSStopTime -= rkoffset;
+  
   pOverlay->Acquire();
 
   CSingleLock lock(*this);

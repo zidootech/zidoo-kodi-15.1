@@ -252,8 +252,11 @@ void CDVDPlayerVideo::OpenStream(CDVDStreamInfo &hint, CDVDVideoCodec* codec)
 void CDVDPlayerVideo::CloseStream(bool bWaitForBuffers)
 {
   // wait until buffers are empty
-  if (bWaitForBuffers && m_speed > 0) m_messageQueue.WaitUntilEmpty();
-
+  if (bWaitForBuffers && m_speed > 0) 
+  {
+     m_messageQueue.WaitUntilEmpty();
+     m_pVideoCodec->SetCodecControl(-1);
+  }
   m_messageQueue.Abort();
 
   // wait for decode_video thread to end
@@ -355,6 +358,9 @@ void CDVDPlayerVideo::Process()
 
     if (pMsg->IsType(CDVDMsg::GENERAL_SYNCHRONIZE))
     {
+      m_packets.clear();
+      if(m_pVideoCodec)
+          m_pVideoCodec->Reset();
       if(((CDVDMsgGeneralSynchronize*)pMsg)->Wait(100, SYNCSOURCE_VIDEO))
       {
         CLog::Log(LOGDEBUG, "CDVDPlayerVideo - CDVDMsg::GENERAL_SYNCHRONIZE");
@@ -1223,8 +1229,10 @@ std::string CDVDPlayerVideo::GetPlayerInfo()
   s << ", vq:"   << std::setw(2) << std::min(99,GetLevel()) << "%";
   s << ", dc:"   << m_codecname;
   s << ", Mb/s:" << std::fixed << std::setprecision(2) << (double)GetVideoBitrate() / (1024.0*1024.0);
-  s << ", drop:" << m_iDroppedFrames;
-  s << ", skip:" << g_renderManager.GetSkippedFrames();
+//  s << ", drop:" << m_iDroppedFrames;
+//  s << ", skip:" << g_renderManager.GetSkippedFrames();
+  s << ", drop:" << 0;  
+  s << ", skip:" << 0;
 
   int pc = m_pullupCorrection.GetPatternLength();
   if (pc > 0)

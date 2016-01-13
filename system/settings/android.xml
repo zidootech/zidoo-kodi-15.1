@@ -17,6 +17,15 @@
     </category>
     <category id="videoacceleration">
       <group id="3">
+        <setting id="videoplayer.userkcodec" type="boolean" label="38030">
+          <visible>true</visible>
+          <level>2</level>
+          <default>true</default>
+          <updates>
+            <update type="change" />
+          </updates>
+          <control type="toggle" />
+        </setting>
         <setting id="videoplayer.usestagefright" type="boolean" label="13436" help="36260">
           <requirement>HAVE_LIBSTAGEFRIGHTDECODER</requirement>
           <level>2</level>

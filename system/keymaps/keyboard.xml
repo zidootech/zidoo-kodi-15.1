@@ -333,6 +333,7 @@
       <t>ShowSubtitles</t>
       <t mod="ctrl">SubtitleAlign</t>
       <l>NextSubtitle</l>
+      <t>AudioNextLanguage</t>
       <left>StepBack</left>
       <right>StepForward</right>
       <up>ChapterOrBigStepForward</up>
@@ -508,6 +509,7 @@
       <zoom>AspectRatio</zoom>
       <t>ShowSubtitles</t>
       <l>NextSubtitle</l>
+      <t>AudioNextLanguage</t>
       <a>AudioDelay</a>
       <escape>Fullscreen</escape>
       <return>Select</return>

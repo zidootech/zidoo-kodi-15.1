@@ -229,6 +229,7 @@ bool CLinuxRendererGLES::Configure(unsigned int width, unsigned int height, unsi
 
   // Calculate the input frame aspect ratio.
   CalculateFrameAspectRatio(d_width, d_height);
+  setBestResolution(width, height);
   ChooseBestResolution(fps);
   SetViewMode(CMediaSettings::GetInstance().GetCurrentVideoSettings().m_ViewMode);
   ManageDisplay();

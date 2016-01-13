@@ -116,6 +116,8 @@ public:
   static const std::string SETTING_VIDEOPLAYER_QUITSTEREOMODEONSTOP;
   static const std::string SETTING_VIDEOPLAYER_RENDERMETHOD;
   static const std::string SETTING_VIDEOPLAYER_HQSCALERS;
+  static const std::string SETTING_VIDEOPLAYER_USERKCODEC;  
+  static const std::string SETTING_VIDEOPLAYER_USERKFPSMATCH;   
   static const std::string SETTING_VIDEOPLAYER_USEAMCODEC;
   static const std::string SETTING_VIDEOPLAYER_USEMEDIACODEC;
   static const std::string SETTING_VIDEOPLAYER_USEMEDIACODECSURFACE;

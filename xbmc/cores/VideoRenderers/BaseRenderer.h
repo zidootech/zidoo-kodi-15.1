@@ -112,6 +112,7 @@ public:
 
 protected:
   void       ChooseBestResolution(float fps);
+  void       setBestResolution(int width,int height);
   bool       FindResolutionFromOverride(float fps, float& weight, bool fallback);
   void       FindResolutionFromFpsMatch(float fps, float& weight);
   RESOLUTION FindClosestResolution(float fps, float multiplier, RESOLUTION current, float& weight);
@@ -131,7 +132,9 @@ protected:
   unsigned int m_sourceHeight;
   float m_sourceFrameRatio;
   float m_fps;
-
+  int m_width;
+  int m_height;
+  
   unsigned int m_renderOrientation; // orientation of the video in degress counter clockwise
   unsigned int m_oldRenderOrientation; // orientation of the previous frame
   // for drawing the texture with glVertex4f (holds all 4 corner points of the destination rect
