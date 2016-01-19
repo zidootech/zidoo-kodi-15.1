@@ -250,7 +250,7 @@ bool CEGLNativeTypeRockchip::GetPreferredResolution(RESOLUTION_INFO *res) const
 
 bool CEGLNativeTypeRockchip::SetDisplayResolution(const char *resolution)
 {
-  return false;
+  //return false;
   CLog::Log(LOGDEBUG,"EGL SetDisplayResolution %s",resolution);
   // current 3d mode 
   if (Get3DMode() >= 0)
