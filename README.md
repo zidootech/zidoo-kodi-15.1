@@ -1,3 +1,13 @@
+### zidoo-rk3368-16.0b4
+
+Base on Kodi v16.0 Jarvis - beta 4.
+
+This branch is for Zidoo X6 Pro, and can be run on every device with rk3368 inside.
+
+Nevertheless, Zidoo X6 Pro is the best choice for you to run this version.
+
+Enjoy! 
+
 #### About
 
 Kodi is an award-winning free and open source (GPL) software media player and
